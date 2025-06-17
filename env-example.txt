@@ -1,0 +1,13 @@
+# Copie este arquivo para .env e configure suas variáveis
+
+# Environment
+NODE_ENV=dev
+
+# Database
+DATABASE_URL="postgresql://postgres:123456@localhost:5432/findafriend"
+
+# JWT
+JWT_SECRET="your-secret-key-here-change-this-in-production"
+
+# Server
+PORT=3333 
