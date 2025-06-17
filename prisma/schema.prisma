@@ -41,6 +41,7 @@ model Pet {
   independence     String
   environment      String
   adoption_requirements String[]
+  photos           String[] @default([])
   
   org_id String
   org    Org    @relation(fields: [org_id], references: [id])

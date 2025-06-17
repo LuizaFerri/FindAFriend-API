@@ -1,6 +1,9 @@
 import fastify from 'fastify'
 import jwt from '@fastify/jwt'
 import cookie from '@fastify/cookie'
+import multipart from '@fastify/multipart'
+import staticFiles from '@fastify/static'
+import path from 'node:path'
 import { ZodError } from 'zod'
 import { env } from './env'
 import { orgsRoutes } from './http/controllers/orgs/routes'
@@ -13,6 +16,18 @@ app.register(jwt, {
 })
 
 app.register(cookie)
+
+app.register(multipart, {
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+    files: 10, // máximo 10 arquivos
+  },
+})
+
+app.register(staticFiles, {
+  root: path.join(process.cwd(), 'uploads'),
+  prefix: '/uploads/',
+})
 
 app.register(orgsRoutes)
 app.register(petsRoutes)

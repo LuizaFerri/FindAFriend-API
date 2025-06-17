@@ -12,6 +12,7 @@ interface CreatePetUseCaseRequest {
   independence: string
   environment: string
   adoption_requirements: string[]
+  photos?: string[]
   org_id: string
 }
 
@@ -34,6 +35,7 @@ export class CreatePetUseCase {
     independence,
     environment,
     adoption_requirements,
+    photos = [],
     org_id,
   }: CreatePetUseCaseRequest): Promise<CreatePetUseCaseResponse> {
     const org = await this.orgsRepository.findById(org_id)
@@ -85,6 +87,7 @@ export class CreatePetUseCase {
       independence,
       environment,
       adoption_requirements,
+      photos,
       org: {
         connect: {
           id: org_id,

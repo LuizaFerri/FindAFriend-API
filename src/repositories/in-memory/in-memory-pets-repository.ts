@@ -39,6 +39,7 @@ export class InMemoryPetsRepository implements PetsRepository {
       independence: data.independence,
       environment: data.environment,
       adoption_requirements: data.adoption_requirements as string[],
+      photos: (data.photos as string[]) ?? [],
       org_id: data.org?.connect?.id ?? '',
       created_at: new Date(),
     }
