@@ -28,6 +28,8 @@
     "@fastify/jwt": "^7.2.4",
     "@fastify/multipart": "^8.3.0",
     "@fastify/static": "^7.0.4",
+    "@fastify/swagger": "^8.15.0",
+    "@fastify/swagger-ui": "^4.0.0",
     "@prisma/client": "5.7.1",
     "bcryptjs": "2.4.3",
     "dayjs": "1.11.10",

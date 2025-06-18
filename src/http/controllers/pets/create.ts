@@ -3,6 +3,80 @@ import { z } from 'zod'
 import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 import { makeCreatePetUseCase } from '@/use-cases/factories/make-create-pet-use-case'
 import { saveUploadedFile } from '@/utils/file-upload'
+import { petSchema } from '@/utils/swagger-schemas'
+
+export const createPetSchema = {
+  description: 'Cadastrar um novo pet para adoção',
+  tags: ['Pets'],
+  security: [{ bearerAuth: [] }],
+  consumes: ['multipart/form-data'],
+  body: {
+    type: 'object',
+    required: ['name', 'age', 'size', 'energy_level', 'independence', 'environment', 'adoption_requirements'],
+    properties: {
+      name: { type: 'string', description: 'Nome do pet' },
+      about: { type: 'string', description: 'Descrição do pet (opcional)' },
+      age: { 
+        type: 'string', 
+        enum: ['FILHOTE', 'ADULTO', 'IDOSO'],
+        description: 'Idade do pet'
+      },
+      size: { 
+        type: 'string', 
+        enum: ['PEQUENO', 'MEDIO', 'GRANDE'],
+        description: 'Porte do pet'
+      },
+      energy_level: { 
+        type: 'string', 
+        enum: ['01', '02', '03', '04', '05'],
+        description: 'Nível de energia (1-5)'
+      },
+      independence: { 
+        type: 'string', 
+        enum: ['BAIXO', 'MEDIO', 'ALTO'],
+        description: 'Nível de independência'
+      },
+      environment: { 
+        type: 'string', 
+        enum: ['APARTAMENTO', 'CASA', 'QUINTAL_PEQUENO', 'QUINTAL_GRANDE'],
+        description: 'Ambiente adequado'
+      },
+      adoption_requirements: {
+        type: 'string',
+        description: 'Requisitos para adoção (JSON array de strings)'
+      },
+      photos: {
+        type: 'array',
+        items: { type: 'string', format: 'binary' },
+        description: 'Fotos do pet (máximo 10 arquivos, 5MB cada)'
+      },
+    },
+  },
+  response: {
+    201: {
+      description: 'Pet cadastrado com sucesso',
+      type: 'object',
+      properties: {
+        pet: petSchema,
+      },
+    },
+    401: {
+      description: 'Token de autenticação inválido ou ausente',
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+      },
+    },
+    400: {
+      description: 'Dados inválidos',
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        issues: { type: 'object' },
+      },
+    },
+  },
+}
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
   try {
