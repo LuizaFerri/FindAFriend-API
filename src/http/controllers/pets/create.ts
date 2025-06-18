@@ -6,10 +6,10 @@ import { saveUploadedFile } from '@/utils/file-upload'
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
   try {
-    const data = await request.saveRequestFiles()
+    const parts = request.parts()
     
     const createPetBodySchema = z.object({
-      name: z.string(),
+      name: z.string().min(1),
       about: z.string().optional(),
       age: z.enum(['FILHOTE', 'ADULTO', 'IDOSO']),
       size: z.enum(['PEQUENO', 'MEDIO', 'GRANDE']),
@@ -19,20 +19,29 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       adoption_requirements: z.string(),
     })
 
-    // Extrair dados dos campos do formulário
     const fields: Record<string, any> = {}
-    for (const file of data) {
-      if (file.type === 'field') {
-        fields[file.fieldname] = file.value
+    const photoUrls: string[] = []
+    
+    for await (const part of parts) {
+      if (part.type === 'field') {
+        fields[part.fieldname] = part.value
+      } else if (part.type === 'file' && part.fieldname === 'photos') {
+        const uploadedFile = await saveUploadedFile(
+          part.file,
+          part.filename || 'photo.jpg',
+          part.mimetype,
+        )
+        photoUrls.push(uploadedFile.url)
       }
     }
 
-    // Parse dos requirements (vem como string do FormData)
+    let adoptionRequirements: string[] = []
     if (fields.adoption_requirements) {
       try {
-        fields.adoption_requirements = JSON.parse(fields.adoption_requirements)
+        const parsed = JSON.parse(fields.adoption_requirements)
+        adoptionRequirements = Array.isArray(parsed) ? parsed : [parsed]
       } catch {
-        fields.adoption_requirements = [fields.adoption_requirements]
+        adoptionRequirements = [fields.adoption_requirements]
       }
     }
 
@@ -44,21 +53,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       energy_level,
       independence,
       environment,
-      adoption_requirements,
     } = createPetBodySchema.parse(fields)
-
-    // Processar arquivos de imagem
-    const photoUrls: string[] = []
-    for (const file of data) {
-      if (file.type === 'file' && file.fieldname === 'photos') {
-        const uploadedFile = await saveUploadedFile(
-          file.file,
-          file.filename,
-          file.mimetype,
-        )
-        photoUrls.push(uploadedFile.url)
-      }
-    }
 
     const createPetUseCase = makeCreatePetUseCase()
 
@@ -70,9 +65,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       energy_level,
       independence,
       environment,
-      adoption_requirements: Array.isArray(adoption_requirements) 
-        ? adoption_requirements 
-        : [adoption_requirements],
+      adoption_requirements: adoptionRequirements,
       photos: photoUrls,
       org_id: request.user.sub,
     })
@@ -81,8 +74,13 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       pet: {
         id: pet.id,
         name: pet.name,
+        about: pet.about,
         age: pet.age,
         size: pet.size,
+        energy_level: pet.energy_level,
+        independence: pet.independence,
+        environment: pet.environment,
+        adoption_requirements: pet.adoption_requirements,
         photos: pet.photos,
       },
     })
