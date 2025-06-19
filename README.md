@@ -15,22 +15,6 @@
 
 ---
 
-## 📋 Índice
-
-- [📖 Sobre o Projeto](#-sobre-o-projeto)
-- [✨ Funcionalidades](#-funcionalidades)
-- [🛠️ Tecnologias](#️-tecnologias)
-- [📋 Pré-requisitos](#-pré-requisitos)
-- [🚀 Como Executar](#-como-executar)
-- [🐳 Docker](#-docker)
-- [📚 Documentação da API](#-documentação-da-api)
-- [🧪 Testes](#-testes)
-- [📁 Estrutura do Projeto](#-estrutura-do-projeto)
-- [🤝 Como Contribuir](#-como-contribuir)
-- [📄 Licença](#-licença)
-
----
-
 ## 📖 Sobre o Projeto
 
 A **FindAFriend API** é uma aplicação backend robusta para facilitar a adoção de pets. O sistema permite que organizações cadastrem animais disponíveis para adoção e que usuários busquem pets por localização e características específicas.
